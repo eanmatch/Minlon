@@ -63,8 +63,9 @@ const I18N = {
     lblEfter18: 'Timer efter kl. 18', hintEfter18: '(får tillæg efter 18)',
     lblHelligdag: 'Helligdagstimer', hintHelligdag: '(får helligdagstillæg)',
     cardOvertime: 'Overarbejde',
-    overtimeNote: 'Én linje pr. dag. Timerne fordeles automatisk på 1.-2., 3.-4. og 5.-6. times sats.',
-    btnAddOvertime: '+ Tilføj dag med overarbejde',
+    overtimeNote: 'Én linje pr. dag — timerne fordeles automatisk på 1.-2., 3.-4. og 5.-6. time.',
+    btnAddOvertime: '+ Tilføj overarbejde',
+    cardHelligdag: 'Helligdag',
     lblOtDay: 'Timer overarbejde',
     otSplit: '1-2: {a} · 3-4: {b} · 5-6: {c} t',
     ariaRemoveRow: 'Fjern',
@@ -132,8 +133,9 @@ const I18N = {
     lblEfter18: 'Hours after 18:00', hintEfter18: '(get the after-18 supplement)',
     lblHelligdag: 'Public holiday hours', hintHelligdag: '(get the holiday supplement)',
     cardOvertime: 'Overtime',
-    overtimeNote: 'One line per day. Hours are split automatically across the 1st-2nd, 3rd-4th and 5th-6th hour rates.',
-    btnAddOvertime: '+ Add a day with overtime',
+    overtimeNote: 'One line per day — hours are split automatically into the 1st-2nd, 3rd-4th and 5th-6th hour.',
+    btnAddOvertime: '+ Add overtime',
+    cardHelligdag: 'Public holiday',
     lblOtDay: 'Overtime hours',
     otSplit: '1-2: {a} · 3-4: {b} · 5-6: {c} h',
     ariaRemoveRow: 'Remove',
@@ -200,9 +202,10 @@ const I18N = {
     lblNormal: 'Ore normale', hintNormal: '(fără ore suplimentare)',
     lblEfter18: 'Ore după 18:00', hintEfter18: '(primesc sporul după 18)',
     lblHelligdag: 'Ore de sărbătoare', hintHelligdag: '(primesc sporul de sărbătoare)',
-    cardOvertime: 'Ore suplimentare',
-    overtimeNote: 'Un rând pe zi. Orele se împart automat pe tarifele pt. ora 1-2, 3-4 și 5-6.',
-    btnAddOvertime: '+ Adaugă o zi cu ore suplimentare',
+    cardOvertime: 'Ore suplimentare (overarbejde)',
+    overtimeNote: 'Un rând pe zi — orele se împart automat pe ora 1-2, 3-4 și 5-6.',
+    btnAddOvertime: '+ Adaugă ore suplimentare',
+    cardHelligdag: 'Sărbătoare',
     lblOtDay: 'Ore suplimentare',
     otSplit: '1-2: {a} · 3-4: {b} · 5-6: {c} h',
     ariaRemoveRow: 'Șterge',
@@ -419,6 +422,7 @@ function createOtRow(hours) {
   input.addEventListener('input', () => updateOtSplit(row));
   row.querySelector('.remove-row-btn').addEventListener('click', () => {
     row.remove();
+    updateOtNote();
     saveState();
   });
   updateOtSplit(row);
@@ -427,6 +431,12 @@ function createOtRow(hours) {
 
 function otRows() {
   return Array.from(document.querySelectorAll('#otList .ot-row'));
+}
+
+// Explicația „o linie pe zi" apare doar după ce s-a adăugat un rând (ca în Vagtløn,
+// secțiunea goală arată doar butonul).
+function updateOtNote() {
+  document.getElementById('otNote').hidden = otRows().length === 0;
 }
 
 function readInputs() {
@@ -451,6 +461,9 @@ function saveState() {
 function restoreState(state) {
   STATE_FIELDS.forEach((id) => { document.getElementById(id).value = state[id] || ''; });
   (state.overtime || []).forEach((h) => document.getElementById('otList').appendChild(createOtRow(h)));
+  updateOtNote();
+  // Secțiunea Helligdag e pliată implicit; o deschidem dacă are deja ore salvate.
+  if (parseNum(state.hHelligdag) > 0) document.getElementById('helligdagGroup').open = true;
 }
 
 function setRow(rowId, valueId, value) {
@@ -553,6 +566,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 document.getElementById('addOtBtn').addEventListener('click', () => {
   const row = createOtRow();
   document.getElementById('otList').appendChild(row);
+  updateOtNote();
   row.querySelector('.otHours').focus();
   saveState();
 });

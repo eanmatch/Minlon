@@ -58,18 +58,23 @@
         <label for="hEfter18"><span data-i18n="lblEfter18">Timer efter kl. 18</span> <span class="hint" data-i18n="hintEfter18">(får tillæg efter 18)</span></label>
         <input type="text" id="hEfter18" inputmode="decimal" autocomplete="off" placeholder="0">
       </div>
-      <div class="field-row">
-        <label for="hHelligdag"><span data-i18n="lblHelligdag">Helligdagstimer</span> <span class="hint" data-i18n="hintHelligdag">(får helligdagstillæg)</span></label>
-        <input type="text" id="hHelligdag" inputmode="decimal" autocomplete="off" placeholder="0">
+      <div class="overarbejde-section">
+        <div class="overarbejde-title" data-i18n="cardOvertime">Overarbejde</div>
+        <p class="settings-note" id="otNote" data-i18n="overtimeNote" hidden>Én linje pr. dag — timerne fordeles automatisk på 1.-2., 3.-4. og 5.-6. time.</p>
+        <div id="otList"></div>
+        <button type="button" class="btn-add-row" id="addOtBtn" data-i18n="btnAddOvertime">+ Tilføj overarbejde</button>
       </div>
     </section>
 
-    <section class="card">
-      <h2 class="card-title" data-i18n="cardOvertime">Overarbejde</h2>
-      <p class="settings-note" data-i18n="overtimeNote">Én linje pr. dag. Timerne fordeles automatisk på 1.-2., 3.-4. og 5.-6. times sats.</p>
-      <div id="otList"></div>
-      <button type="button" class="btn-add-row" id="addOtBtn" data-i18n="btnAddOvertime">+ Tilføj dag med overarbejde</button>
-    </section>
+    <details class="card shift-group" id="helligdagGroup">
+      <summary data-i18n="cardHelligdag">Helligdag</summary>
+      <div class="shift-group-body">
+        <div class="field-row">
+          <label for="hHelligdag"><span data-i18n="lblHelligdag">Helligdagstimer</span> <span class="hint" data-i18n="hintHelligdag">(får helligdagstillæg)</span></label>
+          <input type="text" id="hHelligdag" inputmode="decimal" autocomplete="off" placeholder="0">
+        </div>
+      </div>
+    </details>
 
     <details class="card shift-group">
       <summary data-i18n="cardExtra">Ekstra udbetalinger</summary>
