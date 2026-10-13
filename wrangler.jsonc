@@ -1,0 +1,10 @@
+// Cloudflare Workers (static assets). Build: `bash build.sh` → `dist/`; deploy: `npx wrangler deploy`.
+// Publicăm DOAR `dist/` — acolo sw.js are build id-ul substituit (altfel telefoanele nu
+// detectează versiuni noi), iar build.sh/README nu ajung publice.
+{
+  "name": "minlon",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}

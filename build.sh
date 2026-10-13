@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Construiește `dist/` — aplicația Minløn (daghold, un singur tip de tură).
-# Cloudflare Pages: build command `bash build.sh`, output directory `dist`.
+# Cloudflare Workers: build command `bash build.sh`, deploy command `npx wrangler deploy`
+# (wrangler.jsonc publică doar `dist/`).
 # Fonturile sunt self-hosted în `fonts/`.
 # Nicio sumă personală în cod: toate tarifele se introduc în Setări și stau doar în
 # localStorage-ul telefonului.
@@ -22,7 +23,7 @@ cp "$APP_DIR"/fonts/*.woff2 "$OUT/fonts/"
 
 # Același mecanism ca în build.sh-ul principal: build id unic → sw.js diferit la
 # fiecare publicare → telefoanele preiau versiunea nouă automat.
-BUILD_ID="${CF_PAGES_COMMIT_SHA:-$(date +%Y%m%d%H%M%S)}"
+BUILD_ID="${WORKERS_CI_COMMIT_SHA:-${CF_PAGES_COMMIT_SHA:-$(date +%Y%m%d%H%M%S)}}"
 sed -i.bak "s/__BUILD_ID__/$BUILD_ID/g" "$OUT/sw.js" && rm -f "$OUT/sw.js.bak"
 
 EXPECTED="const CACHE_NAME = 'minlon-$BUILD_ID';"
