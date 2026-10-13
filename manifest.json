@@ -1,6 +1,6 @@
 {
   "name": "Minløn - Lønberegner",
-  "short_name": "Minløn - Lønberegner",
+  "short_name": "Minløn",
   "description": "Beregner af forventet nettoløn for daghold",
   "start_url": "./",
   "scope": "./",
