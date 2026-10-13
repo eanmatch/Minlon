@@ -166,6 +166,12 @@
     <button class="btn-primary" id="saveBtn" data-i18n="btnSave">Gem indstillinger</button>
     <p class="save-msg" id="saveMsg"></p>
 
+    <section class="card">
+      <h2 class="card-title" data-i18n="cardShare">Del appen</h2>
+      <p class="settings-note" data-i18n="shareNote">Vis QR-koden eller send linket til en, der også skal bruge Minløn. Dine tal deles ikke.</p>
+      <button type="button" class="btn-add-row" id="shareBtn" data-i18n="btnShare">↗ Del link / QR-kode</button>
+    </section>
+
     <details class="card shift-group">
       <summary data-i18n="cardPrivacy">Privatliv</summary>
       <div class="shift-group-body">
@@ -184,6 +190,18 @@
   </nav>
 
 </div>
+
+<dialog class="share-dialog" id="shareDialog" aria-labelledby="shareTitle">
+  <h2 class="card-title" id="shareTitle" data-i18n="cardShare">Del appen</h2>
+  <img class="share-qr" src="icons/qr.svg" width="220" height="220" alt="QR: minlon.pages.dev">
+  <p class="share-url" id="shareUrl"></p>
+  <div class="share-actions">
+    <button type="button" class="btn-add-row" id="shareCopyBtn" data-i18n="btnCopyLink">Kopiér link</button>
+    <button type="button" class="btn-add-row" id="shareNativeBtn" data-i18n="btnShareNative" hidden>Del…</button>
+  </div>
+  <p class="save-msg" id="shareMsg"></p>
+  <button type="button" class="btn-primary" id="shareCloseBtn" data-i18n="btnClose">Luk</button>
+</dialog>
 
 <script src="app.js"></script>
 </body>

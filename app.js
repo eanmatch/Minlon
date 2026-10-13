@@ -109,6 +109,14 @@ const I18N = {
     privacyText: 'Alt, hvad du skriver, gemmes kun i denne browser på din telefon (localStorage). Intet sendes til en server, og der bruges ingen cookies eller statistik.',
     tabCalc: 'Beregn',
     tabSettings: 'Indstillinger',
+    cardShare: 'Del appen',
+    shareNote: 'Vis QR-koden eller send linket til en, der også skal bruge Minløn. Dine tal deles ikke.',
+    btnShare: '↗ Del link / QR-kode',
+    btnCopyLink: 'Kopiér link',
+    btnShareNative: 'Del…',
+    btnClose: 'Luk',
+    shareCopied: 'Linket er kopieret ✓',
+    shareText: 'Minløn — lønberegner for daghold',
   },
   en: {
     title: 'Minløn — Pay calculator',
@@ -170,6 +178,14 @@ const I18N = {
     privacyText: 'Everything you type is stored only in this browser on your phone (localStorage). Nothing is sent to a server, and no cookies or analytics are used.',
     tabCalc: 'Calculate',
     tabSettings: 'Settings',
+    cardShare: 'Share the app',
+    shareNote: 'Show the QR code or send the link to someone who should also use Minløn. Your numbers are not shared.',
+    btnShare: '↗ Share link / QR code',
+    btnCopyLink: 'Copy link',
+    btnShareNative: 'Share…',
+    btnClose: 'Close',
+    shareCopied: 'Link copied ✓',
+    shareText: 'Minløn — pay calculator for day shifts',
   },
   ro: {
     title: 'Minløn — Calculator salariu',
@@ -231,6 +247,14 @@ const I18N = {
     privacyText: 'Tot ce scrii se salvează doar în acest browser, pe telefonul tău (localStorage). Nimic nu e trimis la vreun server și nu se folosesc cookies sau statistici.',
     tabCalc: 'Calcul',
     tabSettings: 'Setări',
+    cardShare: 'Distribuie aplicația',
+    shareNote: 'Arată codul QR sau trimite link-ul cuiva care vrea să folosească Minløn. Cifrele tale nu se trimit.',
+    btnShare: '↗ Distribuie link / cod QR',
+    btnCopyLink: 'Copiază link-ul',
+    btnShareNative: 'Trimite…',
+    btnClose: 'Închide',
+    shareCopied: 'Link copiat ✓',
+    shareText: 'Minløn — calculator de salariu pentru tura de zi',
   },
 };
 
@@ -531,6 +555,55 @@ document.getElementById('addOtBtn').addEventListener('click', () => {
   document.getElementById('otList').appendChild(row);
   row.querySelector('.otHours').focus();
   saveState();
+});
+
+// ---------- Del appen ----------
+// Link canonic, același pe care îl codifică icons/qr.svg (generat o dată, static — fără
+// bibliotecă QR în client). Dacă se schimbă domeniul, regenerează și qr.svg.
+const APP_URL = 'https://minlon.pages.dev/';
+
+const shareDialog = document.getElementById('shareDialog');
+const shareMsg = document.getElementById('shareMsg');
+const shareNativeBtn = document.getElementById('shareNativeBtn');
+document.getElementById('shareUrl').textContent = 'minlon.pages.dev';
+shareNativeBtn.hidden = typeof navigator.share !== 'function';
+
+document.getElementById('shareBtn').addEventListener('click', () => {
+  shareMsg.textContent = '';
+  if (typeof shareDialog.showModal === 'function') shareDialog.showModal();
+  else shareDialog.setAttribute('open', '');
+});
+
+function closeShareDialog() {
+  if (typeof shareDialog.close === 'function') shareDialog.close();
+  else shareDialog.removeAttribute('open');
+}
+
+document.getElementById('shareCloseBtn').addEventListener('click', closeShareDialog);
+
+// Click pe fundal (în afara conținutului) închide pop-up-ul.
+shareDialog.addEventListener('click', (e) => {
+  if (e.target === shareDialog) closeShareDialog();
+});
+
+document.getElementById('shareCopyBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(APP_URL);
+  } catch (e) {
+    // Clipboard refuzat / browser vechi: selectăm link-ul ca userul să-l copieze manual.
+    const range = document.createRange();
+    range.selectNodeContents(document.getElementById('shareUrl'));
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    return;
+  }
+  shareMsg.textContent = I18N[lang].shareCopied;
+  setTimeout(() => (shareMsg.textContent = ''), 2000);
+});
+
+shareNativeBtn.addEventListener('click', () => {
+  navigator.share({ title: 'Minløn', text: I18N[lang].shareText, url: APP_URL }).catch(() => {});
 });
 
 document.querySelectorAll('.lang-btn').forEach((btn) => {

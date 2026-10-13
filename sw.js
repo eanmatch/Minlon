@@ -14,6 +14,7 @@ const ASSETS = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/logo.svg',
+  './icons/qr.svg',
   './fonts/inter.woff2',
   './fonts/inter-ext.woff2',
   './fonts/spacegrotesk.woff2',
