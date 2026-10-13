@@ -50,7 +50,7 @@ const STORAGE = {
 // ---------- i18n ----------
 const I18N = {
   da: {
-    title: 'Minløn — Lønberegner',
+    title: 'Minløn - Lønberegner',
     brandSub: 'Daghold · beregner',
     readoutLabel: 'Netto denne periode',
     netSubEmpty: 'Udfyld timer for at beregne',
