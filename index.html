@@ -64,7 +64,7 @@
 
     <section class="card">
       <h2 class="card-title" data-i18n="cardOvertime">Overarbejde</h2>
-      <p class="settings-note" data-i18n="overtimeNote">Én linje pr. dag. De første 2 timer får 1.-2. times sats, resten 3.-4. times sats.</p>
+      <p class="settings-note" data-i18n="overtimeNote">Én linje pr. dag. Timerne fordeles automatisk på 1.-2., 3.-4. og 5.-6. times sats.</p>
       <div id="otList"></div>
       <button type="button" class="btn-add-row" id="addOtBtn" data-i18n="btnAddOvertime">+ Tilføj dag med overarbejde</button>
     </section>
@@ -90,6 +90,7 @@
       <div class="row muted"><span data-i18n="rowNormal">Normaltimer</span><span id="bNormal">—</span></div>
       <div class="row muted" id="rowOt12"><span data-i18n="rowOt12">Overarbejde 1. og 2. time</span><span id="bOt12">—</span></div>
       <div class="row muted" id="rowOt34"><span data-i18n="rowOt34">Overarbejde 3. og 4. time</span><span id="bOt34">—</span></div>
+      <div class="row muted" id="rowOt56"><span data-i18n="rowOt56">Overarbejde 5. og 6. time</span><span id="bOt56">—</span></div>
       <div class="row muted" id="rowEfter18"><span data-i18n="rowEfter18">Tillæg efter 18</span><span id="bEfter18">—</span></div>
       <div class="row muted" id="rowHelligdag"><span data-i18n="rowHelligdag">Helligdagstillæg</span><span id="bHelligdag">—</span></div>
       <div class="row muted" id="rowExtra"><span data-i18n="rowExtra">Ekstra udbetalinger</span><span id="bExtra">—</span></div>
@@ -125,6 +126,10 @@
         <input type="text" id="sOt34" inputmode="decimal" autocomplete="off" placeholder="0">
       </div>
       <div class="field-row">
+        <label for="sOt56" data-i18n="lblOt56">Overarbejde 5. og 6. time</label>
+        <input type="text" id="sOt56" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field-row">
         <label for="sEfter18" data-i18n="lblEfter18Rate">Tillæg efter 18</label>
         <input type="text" id="sEfter18" inputmode="decimal" autocomplete="off" placeholder="0">
       </div>
@@ -147,18 +152,10 @@
     </section>
 
     <section class="card">
-      <h2 class="card-title" data-i18n="cardPension">Pension, ATP &amp; fradrag</h2>
+      <h2 class="card-title" data-i18n="cardPension">Pension &amp; fradrag</h2>
       <div class="field-row">
         <label for="sPension" data-i18n="lblPension">Egen pension %</label>
         <input type="text" id="sPension" inputmode="decimal" autocomplete="off" placeholder="0">
-      </div>
-      <div class="field-row">
-        <label for="sPensionBase"><span data-i18n="lblPensionBase">Pensionsgrundlag % af bruttoløn</span> <span class="hint" data-i18n="hintPensionBase">(grundlag ÷ bruttoløn på lønsedlen, typisk 126,5)</span></label>
-        <input type="text" id="sPensionBase" inputmode="decimal" autocomplete="off" placeholder="100">
-      </div>
-      <div class="field-row">
-        <label for="sAtp"><span data-i18n="lblAtp">ATP pr. periode</span> <span class="hint" data-i18n="hintAtp">(„ATP af løn" på lønsedlen)</span></label>
-        <input type="text" id="sAtp" inputmode="decimal" autocomplete="off" placeholder="0">
       </div>
       <div class="field-row">
         <label for="sOther"><span data-i18n="lblOther">Andre fradrag</span> <span class="hint" data-i18n="hintOther">(f.eks. personaleforening, efter skat)</span></label>

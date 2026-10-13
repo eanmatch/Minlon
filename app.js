@@ -8,24 +8,36 @@
 //     Overarbejde se plătește DOAR ca tillæg peste bază (1.-2. time / 3.-4. time).
 //   - Tillæg efter 18 și Helligdagstillæg: ore × sats, peste bază (orele sunt deja în
 //     normaltimer).
-//   - Pensie proprie: % aplicat pe un grundlag = bruttoløn × factor (pe lønseddel
-//     grundlag ÷ brut = 1,265 exact, adică brut + adaosuri tip feriepenge/SH).
+//   - Overarbejde pe zi: ora 1-2, 3-4 și 5-6 (și după) au fiecare sats proprie.
+//   - Pensie proprie: % aplicat pe un grundlag = bruttoløn × 1,265 (verificat exact pe
+//     două lønsedler — brut + adaosuri tip feriepenge/SH, fix în overenskomst).
+//   - ATP: sumă legală pe perioadă de 14 zile, în trepte după numărul de ore.
 //   - AM-indkomst = brut − pensie − ATP; AM-bidrag 8% și A-skat rotunjite în JOS la
 //     coroane întregi, cum face lønsystemet.
 
 const AM_RATE = 0.08;
+const PENSION_BASE_FACTOR = 1.265;
+
+// ATP (andel lønmodtager) pr. lønperiode på 14 dage, după orele plătite (normaltimer
+// incl. overarbejde). Suma întreagă = cea de pe lønseddel (52,20 la 80,57 și 87,92 t);
+// treptele 2/3 și 1/3 urmează regula ATP pentru 14 zile (52-77 t / 26-51 t).
+const ATP_14D = [[78, 52.20], [52, 34.80], [26, 17.40]];
+
+function atpForHours(hours) {
+  const step = ATP_14D.find(([min]) => hours >= min);
+  return step ? step[1] : 0;
+}
 
 const DEFAULT_SETTINGS = {
   base: 0,
   ot12: 0, // tillæg overarbejde 1. og 2. time (peste bază)
-  ot34: 0, // tillæg overarbejde 3. og 4. time (și orele de după, în lipsa altei satse)
+  ot34: 0, // tillæg overarbejde 3. og 4. time
+  ot56: 0, // tillæg overarbejde 5. og 6. time (și orele de după)
   efter18: 0,
   helligdag: 0,
   fradrag: 0, // fradrag pr. periodă (de pe lønseddel, la A-skat)
   traek: 0,
   pension: 0, // % egen pension
-  pensionBase: 100, // grundlag pensie ca % din brut
-  atp: 0, // ATP fix pr. periodă
   other: 0, // fradrag după impozit (personaleforening etc.)
 };
 
@@ -51,10 +63,10 @@ const I18N = {
     lblEfter18: 'Timer efter kl. 18', hintEfter18: '(får tillæg efter 18)',
     lblHelligdag: 'Helligdagstimer', hintHelligdag: '(får helligdagstillæg)',
     cardOvertime: 'Overarbejde',
-    overtimeNote: 'Én linje pr. dag. De første 2 timer får 1.-2. times sats, resten 3.-4. times sats.',
+    overtimeNote: 'Én linje pr. dag. Timerne fordeles automatisk på 1.-2., 3.-4. og 5.-6. times sats.',
     btnAddOvertime: '+ Tilføj dag med overarbejde',
     lblOtDay: 'Timer overarbejde',
-    otSplit: '1.-2. time: {a} t · 3.-4. time: {b} t',
+    otSplit: '1-2: {a} · 3-4: {b} · 5-6: {c} t',
     ariaRemoveRow: 'Fjern',
     cardExtra: 'Ekstra udbetalinger',
     lblFeriepenge: 'Feriepenge udbetalt',
@@ -64,6 +76,7 @@ const I18N = {
     rowNormal: 'Normaltimer',
     rowOt12: 'Overarbejde 1. og 2. time',
     rowOt34: 'Overarbejde 3. og 4. time',
+    rowOt56: 'Overarbejde 5. og 6. time',
     rowEfter18: 'Tillæg efter 18',
     rowHelligdag: 'Helligdagstillæg',
     rowExtra: 'Ekstra udbetalinger',
@@ -81,16 +94,14 @@ const I18N = {
     lblBase: 'Grundtimeløn',
     lblOt12: 'Overarbejde 1. og 2. time',
     lblOt34: 'Overarbejde 3. og 4. time',
+    lblOt56: 'Overarbejde 5. og 6. time',
     lblEfter18Rate: 'Tillæg efter 18',
     lblHelligdagRate: 'Helligdagstillæg',
     cardTax: 'Skattekort',
     lblFradrag: 'Fradrag pr. periode', hintFradrag: '(står ved A-skat på lønsedlen)',
     lblTraek: 'Trækprocent %',
-    cardPension: 'Pension, ATP & fradrag',
+    cardPension: 'Pension & fradrag',
     lblPension: 'Egen pension %',
-    lblPensionBase: 'Pensionsgrundlag % af bruttoløn',
-    hintPensionBase: '(grundlag ÷ bruttoløn på lønsedlen, typisk 126,5)',
-    lblAtp: 'ATP pr. periode', hintAtp: '(„ATP af løn" på lønsedlen)',
     lblOther: 'Andre fradrag', hintOther: '(f.eks. personaleforening, efter skat)',
     btnSave: 'Gem indstillinger',
     saveMsg: 'Gemt ✓',
@@ -113,10 +124,10 @@ const I18N = {
     lblEfter18: 'Hours after 18:00', hintEfter18: '(get the after-18 supplement)',
     lblHelligdag: 'Public holiday hours', hintHelligdag: '(get the holiday supplement)',
     cardOvertime: 'Overtime',
-    overtimeNote: 'One line per day. The first 2 hours get the 1st-2nd hour rate, the rest the 3rd-4th hour rate.',
+    overtimeNote: 'One line per day. Hours are split automatically across the 1st-2nd, 3rd-4th and 5th-6th hour rates.',
     btnAddOvertime: '+ Add a day with overtime',
     lblOtDay: 'Overtime hours',
-    otSplit: '1st-2nd hour: {a} h · 3rd-4th hour: {b} h',
+    otSplit: '1-2: {a} · 3-4: {b} · 5-6: {c} h',
     ariaRemoveRow: 'Remove',
     cardExtra: 'Extra payouts',
     lblFeriepenge: 'Holiday pay paid out',
@@ -126,6 +137,7 @@ const I18N = {
     rowNormal: 'Normal hours',
     rowOt12: 'Overtime 1st and 2nd hour',
     rowOt34: 'Overtime 3rd and 4th hour',
+    rowOt56: 'Overtime 5th and 6th hour',
     rowEfter18: 'After-18 supplement',
     rowHelligdag: 'Public holiday supplement',
     rowExtra: 'Extra payouts',
@@ -143,16 +155,14 @@ const I18N = {
     lblBase: 'Base hourly wage',
     lblOt12: 'Overtime 1st and 2nd hour',
     lblOt34: 'Overtime 3rd and 4th hour',
+    lblOt56: 'Overtime 5th and 6th hour',
     lblEfter18Rate: 'After-18 supplement',
     lblHelligdagRate: 'Public holiday supplement',
     cardTax: 'Tax card',
     lblFradrag: 'Deduction per period', hintFradrag: '(shown next to A-skat on the payslip)',
     lblTraek: 'Withholding rate %',
-    cardPension: 'Pension, ATP & deductions',
+    cardPension: 'Pension & deductions',
     lblPension: 'Own pension %',
-    lblPensionBase: 'Pension base % of gross pay',
-    hintPensionBase: '(base ÷ gross pay on the payslip, typically 126.5)',
-    lblAtp: 'ATP per period', hintAtp: '("ATP af løn" on the payslip)',
     lblOther: 'Other deductions', hintOther: '(e.g. staff association, after tax)',
     btnSave: 'Save settings',
     saveMsg: 'Saved ✓',
@@ -175,10 +185,10 @@ const I18N = {
     lblEfter18: 'Ore după 18:00', hintEfter18: '(primesc sporul după 18)',
     lblHelligdag: 'Ore de sărbătoare', hintHelligdag: '(primesc sporul de sărbătoare)',
     cardOvertime: 'Ore suplimentare',
-    overtimeNote: 'Un rând pe zi. Primele 2 ore primesc tariful pt. ora 1-2, restul tariful pt. ora 3-4.',
+    overtimeNote: 'Un rând pe zi. Orele se împart automat pe tarifele pt. ora 1-2, 3-4 și 5-6.',
     btnAddOvertime: '+ Adaugă o zi cu ore suplimentare',
     lblOtDay: 'Ore suplimentare',
-    otSplit: 'ora 1-2: {a} h · ora 3-4: {b} h',
+    otSplit: '1-2: {a} · 3-4: {b} · 5-6: {c} h',
     ariaRemoveRow: 'Șterge',
     cardExtra: 'Plăți extra',
     lblFeriepenge: 'Bani de concediu (feriepenge) plătiți',
@@ -188,6 +198,7 @@ const I18N = {
     rowNormal: 'Ore normale',
     rowOt12: 'Ore suplimentare, ora 1 și 2',
     rowOt34: 'Ore suplimentare, ora 3 și 4',
+    rowOt56: 'Ore suplimentare, ora 5 și 6',
     rowEfter18: 'Spor după 18',
     rowHelligdag: 'Spor de sărbătoare',
     rowExtra: 'Plăți extra',
@@ -205,16 +216,14 @@ const I18N = {
     lblBase: 'Salariu de bază pe oră',
     lblOt12: 'Ore suplimentare, ora 1 și 2',
     lblOt34: 'Ore suplimentare, ora 3 și 4',
+    lblOt56: 'Ore suplimentare, ora 5 și 6',
     lblEfter18Rate: 'Spor după 18',
     lblHelligdagRate: 'Spor de sărbătoare',
     cardTax: 'Card fiscal',
     lblFradrag: 'Deducere pe perioadă', hintFradrag: '(scrisă la A-skat pe fluturaș)',
     lblTraek: 'Procent impozit %',
-    cardPension: 'Pensie, ATP și deduceri',
+    cardPension: 'Pensie și deduceri',
     lblPension: 'Pensie proprie %',
-    lblPensionBase: 'Bază pensie % din brut',
-    hintPensionBase: '(grundlag ÷ brut pe fluturaș, de obicei 126,5)',
-    lblAtp: 'ATP pe perioadă', hintAtp: '(„ATP af løn" pe fluturaș)',
     lblOther: 'Alte deduceri', hintOther: '(ex. personaleforening, după impozit)',
     btnSave: 'Salvează setările',
     saveMsg: 'Salvat ✓',
@@ -280,43 +289,49 @@ document.addEventListener('input', (e) => {
   if (el && el.matches && el.matches('input[inputmode="decimal"]')) sanitizeDecimal(el);
 }, true);
 
-const round2 = (n) => Math.round(n * 100) / 100;
+// +1e-7: un produs ca 0,15 × 143,70 = 21,555 iese în virgulă mobilă 21,55499…, iar
+// lønsystemet îl rotunjește la 21,56 (jumătatea în sus). Sumele sunt mereu pozitive.
+const round2 = (n) => Math.round(n * 100 + 1e-7) / 100;
 const fmt = (n) =>
   (isFinite(n) ? n : 0).toLocaleString('da-DK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kr';
 const fmtHours = (n) => n.toLocaleString('da-DK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const fmtField = (n) => String(n).replace('.', ',');
 
 // ---------- Calcul ----------
-// O zi de overarbejde: primele 2 ore la sats 1.-2. time, restul la 3.-4. time (inclusiv
-// eventualele ore peste a 4-a — nu avem o sats separată pentru ele).
+// O zi de overarbejde: ora 1-2 la sats 1.-2. time, ora 3-4 la 3.-4. time, restul (ora 5,
+// 6 și eventual după) la 5.-6. time — nu avem o sats separată peste a 6-a oră.
 function splitOvertime(hours) {
-  const first = Math.min(hours, 2);
-  return { first, rest: Math.max(0, hours - first) };
+  const h12 = Math.min(hours, 2);
+  const h34 = Math.min(Math.max(0, hours - 2), 2);
+  return { h12, h34, h56: Math.max(0, hours - 4) };
 }
 
 function calculatePay(input, s) {
   let ot12h = 0;
   let ot34h = 0;
+  let ot56h = 0;
   for (const h of input.overtimeDays) {
     const sp = splitOvertime(h);
-    ot12h += sp.first;
-    ot34h += sp.rest;
+    ot12h += sp.h12;
+    ot34h += sp.h34;
+    ot56h += sp.h56;
   }
 
-  const baseHours = input.normal + ot12h + ot34h;
+  const baseHours = input.normal + ot12h + ot34h + ot56h;
   const normalPay = round2(baseHours * s.base);
   const ot12Pay = round2(ot12h * s.ot12);
   const ot34Pay = round2(ot34h * s.ot34);
+  const ot56Pay = round2(ot56h * s.ot56);
   const efter18Pay = round2(input.efter18 * s.efter18);
   const helligdagPay = round2(input.helligdag * s.helligdag);
   const extra = input.feriepenge + input.fritvalg;
 
-  const earned = normalPay + ot12Pay + ot34Pay + efter18Pay + helligdagPay;
+  const earned = normalPay + ot12Pay + ot34Pay + ot56Pay + efter18Pay + helligdagPay;
   const gross = earned + extra;
 
   // Feriepenge/fritvalg plătite nu intră în baza de pensie (sunt deja adaosuri).
-  const pension = round2(earned * (s.pensionBase / 100) * (s.pension / 100));
-  const atp = baseHours > 0 ? s.atp : 0;
+  const pension = round2(earned * PENSION_BASE_FACTOR * (s.pension / 100));
+  const atp = atpForHours(baseHours);
   const amIndkomst = Math.max(0, gross - pension - atp);
   const am = Math.floor(amIndkomst * AM_RATE);
   const skattepligtig = Math.max(0, amIndkomst - am - s.fradrag);
@@ -325,8 +340,8 @@ function calculatePay(input, s) {
   const net = amIndkomst - am - askat - other;
 
   return {
-    baseHours, ot12h, ot34h,
-    normalPay, ot12Pay, ot34Pay, efter18Pay, helligdagPay, extra,
+    baseHours, ot12h, ot34h, ot56h,
+    normalPay, ot12Pay, ot34Pay, ot56Pay, efter18Pay, helligdagPay, extra,
     gross, pension, atp, amIndkomst, am, askat, other, net,
   };
 }
@@ -336,11 +351,10 @@ let settings = { ...DEFAULT_SETTINGS, ...(readJson(STORAGE.settings) || {}) };
 let lang = loadLang();
 
 const SETTINGS_FIELDS = [
-  ['sBase', 'base'], ['sOt12', 'ot12'], ['sOt34', 'ot34'],
+  ['sBase', 'base'], ['sOt12', 'ot12'], ['sOt34', 'ot34'], ['sOt56', 'ot56'],
   ['sEfter18', 'efter18'], ['sHelligdag', 'helligdag'],
   ['sFradrag', 'fradrag'], ['sTraek', 'traek'],
-  ['sPension', 'pension'], ['sPensionBase', 'pensionBase'],
-  ['sAtp', 'atp'], ['sOther', 'other'],
+  ['sPension', 'pension'], ['sOther', 'other'],
 ];
 
 function populateSettingsForm() {
@@ -360,7 +374,7 @@ let rowIdSeq = 0;
 function updateOtSplit(row) {
   const sp = splitOvertime(parseNum(row.querySelector('.otHours').value));
   row.querySelector('.ot-split').textContent = I18N[lang].otSplit
-    .replace('{a}', fmtHours(sp.first)).replace('{b}', fmtHours(sp.rest));
+    .replace('{a}', fmtHours(sp.h12)).replace('{b}', fmtHours(sp.h34)).replace('{c}', fmtHours(sp.h56));
 }
 
 function createOtRow(hours) {
@@ -434,6 +448,7 @@ function runCalculation() {
   document.getElementById('bNormal').textContent = fmt(r.normalPay);
   setRow('rowOt12', 'bOt12', r.ot12Pay);
   setRow('rowOt34', 'bOt34', r.ot34Pay);
+  setRow('rowOt56', 'bOt56', r.ot56Pay);
   setRow('rowEfter18', 'bEfter18', r.efter18Pay);
   setRow('rowHelligdag', 'bHelligdag', r.helligdagPay);
   setRow('rowExtra', 'bExtra', r.extra);
