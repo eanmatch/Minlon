@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#151A23">
+<meta name="robots" content="noindex, nofollow">
+<title data-i18n="title">Minløn — Lønberegner</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-mark" src="icons/logo.svg" alt="Minløn" width="28" height="28">
+      <span class="brand-name">Minløn</span>
+    </div>
+    <div class="topbar-right">
+      <span class="brand-sub" data-i18n="brandSub">Daghold · beregner</span>
+      <div class="lang-switch" id="langSwitch">
+        <button type="button" class="lang-btn" data-lang="da">DA</button>
+        <button type="button" class="lang-btn" data-lang="en">EN</button>
+        <button type="button" class="lang-btn" data-lang="ro">RO</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="view-calc" class="view active">
+
+    <section class="readout">
+      <div class="readout-label" data-i18n="readoutLabel">Netto denne periode</div>
+      <div class="readout-value" id="netOut">0,00 kr</div>
+      <div class="readout-sub" id="netSub" data-i18n="netSubEmpty">Udfyld timer for at beregne</div>
+    </section>
+
+    <div class="tax-reminder" id="setupReminder" hidden>
+      <span class="tax-reminder-icon" aria-hidden="true">⚠</span>
+      <div class="tax-reminder-body">
+        <p class="tax-reminder-text" id="setupReminderText"></p>
+        <button type="button" class="tax-reminder-btn" id="goSettingsBtn" data-i18n="btnGoSettings">Gå til indstillinger</button>
+      </div>
+    </div>
+
+    <section class="card">
+      <h2 class="card-title" data-i18n="cardHours">Timer i perioden</h2>
+      <div class="field-row">
+        <label for="hNormal"><span data-i18n="lblNormal">Normaltimer</span> <span class="hint" data-i18n="hintNormal">(uden overarbejde)</span></label>
+        <input type="text" id="hNormal" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field-row">
+        <label for="hEfter18"><span data-i18n="lblEfter18">Timer efter kl. 18</span> <span class="hint" data-i18n="hintEfter18">(får tillæg efter 18)</span></label>
+        <input type="text" id="hEfter18" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field-row">
+        <label for="hHelligdag"><span data-i18n="lblHelligdag">Helligdagstimer</span> <span class="hint" data-i18n="hintHelligdag">(får helligdagstillæg)</span></label>
+        <input type="text" id="hHelligdag" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title" data-i18n="cardOvertime">Overarbejde</h2>
+      <p class="settings-note" data-i18n="overtimeNote">Én linje pr. dag. De første 2 timer får 1.-2. times sats, resten 3.-4. times sats.</p>
+      <div id="otList"></div>
+      <button type="button" class="btn-add-row" id="addOtBtn" data-i18n="btnAddOvertime">+ Tilføj dag med overarbejde</button>
+    </section>
+
+    <details class="card shift-group">
+      <summary data-i18n="cardExtra">Ekstra udbetalinger</summary>
+      <div class="shift-group-body">
+        <div class="field-row">
+          <label for="feriepenge" data-i18n="lblFeriepenge">Feriepenge udbetalt</label>
+          <input type="text" id="feriepenge" inputmode="decimal" autocomplete="off" placeholder="0">
+        </div>
+        <div class="field-row">
+          <label for="fritvalg" data-i18n="lblFritvalg">Fritvalgskonto/helligdage udbetalt</label>
+          <input type="text" id="fritvalg" inputmode="decimal" autocomplete="off" placeholder="0">
+        </div>
+      </div>
+    </details>
+
+    <button class="btn-primary" id="calcBtn" data-i18n="btnCalc">Beregn løn</button>
+
+    <section class="card breakdown" id="breakdown" hidden>
+      <h2 class="card-title" data-i18n="cardSpec">Specifikation</h2>
+      <div class="row muted"><span data-i18n="rowNormal">Normaltimer</span><span id="bNormal">—</span></div>
+      <div class="row muted" id="rowOt12"><span data-i18n="rowOt12">Overarbejde 1. og 2. time</span><span id="bOt12">—</span></div>
+      <div class="row muted" id="rowOt34"><span data-i18n="rowOt34">Overarbejde 3. og 4. time</span><span id="bOt34">—</span></div>
+      <div class="row muted" id="rowEfter18"><span data-i18n="rowEfter18">Tillæg efter 18</span><span id="bEfter18">—</span></div>
+      <div class="row muted" id="rowHelligdag"><span data-i18n="rowHelligdag">Helligdagstillæg</span><span id="bHelligdag">—</span></div>
+      <div class="row muted" id="rowExtra"><span data-i18n="rowExtra">Ekstra udbetalinger</span><span id="bExtra">—</span></div>
+      <div class="row"><span data-i18n="rowGross">Bruttoløn</span><span id="bGross">—</span></div>
+      <div class="divider"></div>
+      <div class="row muted"><span data-i18n="rowAtp">ATP</span><span id="bAtp">—</span></div>
+      <div class="row muted"><span data-i18n="rowPension">Egen pension</span><span id="bPension">—</span></div>
+      <div class="row"><span data-i18n="rowAmIndkomst">AM-indkomst</span><span id="bAmIndkomst">—</span></div>
+      <div class="row muted"><span data-i18n="rowAm">AM-bidrag (8%)</span><span id="bAm">—</span></div>
+      <div class="row muted"><span data-i18n="rowAskat">A-skat</span><span id="bAskat">—</span></div>
+      <div class="row muted" id="rowOther"><span data-i18n="rowOther">Andre fradrag</span><span id="bOther">—</span></div>
+      <div class="divider"></div>
+      <div class="row strong"><span data-i18n="rowNet">Til udbetaling</span><span id="bNet">—</span></div>
+      <p class="disclaimer" data-i18n="disclaimer">Estimat. Erstatter ikke den officielle lønseddel.</p>
+    </section>
+
+  </main>
+
+  <main id="view-settings" class="view">
+    <section class="card">
+      <h2 class="card-title" data-i18n="cardRates">Satser</h2>
+      <p class="settings-note" data-i18n="ratesNote">Aflæs satserne i kolonnen „Sats" på din lønseddel. Gemmes kun på denne telefon.</p>
+      <div class="field-row">
+        <label for="sBase" data-i18n="lblBase">Grundtimeløn</label>
+        <input type="text" id="sBase" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field-row">
+        <label for="sOt12" data-i18n="lblOt12">Overarbejde 1. og 2. time</label>
+        <input type="text" id="sOt12" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field-row">
+        <label for="sOt34" data-i18n="lblOt34">Overarbejde 3. og 4. time</label>
+        <input type="text" id="sOt34" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field-row">
+        <label for="sEfter18" data-i18n="lblEfter18Rate">Tillæg efter 18</label>
+        <input type="text" id="sEfter18" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field-row">
+        <label for="sHelligdag" data-i18n="lblHelligdagRate">Helligdagstillæg</label>
+        <input type="text" id="sHelligdag" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title" data-i18n="cardTax">Skattekort</h2>
+      <div class="field-row">
+        <label for="sFradrag"><span data-i18n="lblFradrag">Fradrag pr. periode</span> <span class="hint" data-i18n="hintFradrag">(står ved A-skat på lønsedlen)</span></label>
+        <input type="text" id="sFradrag" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field-row">
+        <label for="sTraek"><span data-i18n="lblTraek">Trækprocent %</span></label>
+        <input type="text" id="sTraek" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title" data-i18n="cardPension">Pension, ATP &amp; fradrag</h2>
+      <div class="field-row">
+        <label for="sPension" data-i18n="lblPension">Egen pension %</label>
+        <input type="text" id="sPension" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field-row">
+        <label for="sPensionBase"><span data-i18n="lblPensionBase">Pensionsgrundlag % af bruttoløn</span> <span class="hint" data-i18n="hintPensionBase">(grundlag ÷ bruttoløn på lønsedlen, typisk 126,5)</span></label>
+        <input type="text" id="sPensionBase" inputmode="decimal" autocomplete="off" placeholder="100">
+      </div>
+      <div class="field-row">
+        <label for="sAtp"><span data-i18n="lblAtp">ATP pr. periode</span> <span class="hint" data-i18n="hintAtp">(„ATP af løn" på lønsedlen)</span></label>
+        <input type="text" id="sAtp" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+      <div class="field-row">
+        <label for="sOther"><span data-i18n="lblOther">Andre fradrag</span> <span class="hint" data-i18n="hintOther">(f.eks. personaleforening, efter skat)</span></label>
+        <input type="text" id="sOther" inputmode="decimal" autocomplete="off" placeholder="0">
+      </div>
+    </section>
+
+    <button class="btn-primary" id="saveBtn" data-i18n="btnSave">Gem indstillinger</button>
+    <p class="save-msg" id="saveMsg"></p>
+
+    <details class="card shift-group">
+      <summary data-i18n="cardPrivacy">Privatliv</summary>
+      <div class="shift-group-body">
+        <p class="privacy-p" data-i18n="privacyText">Alt, hvad du skriver, gemmes kun i denne browser på din telefon (localStorage). Intet sendes til en server, og der bruges ingen cookies eller statistik.</p>
+      </div>
+    </details>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-view="view-calc">
+      <span class="tab-icon">⏱</span><span data-i18n="tabCalc">Beregn</span>
+    </button>
+    <button class="tab" data-view="view-settings">
+      <span class="tab-icon">⚙</span><span data-i18n="tabSettings">Indstillinger</span>
+    </button>
+  </nav>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+/* Fonturi self-hosted — nicio cerere către Google, coerent cu „fără colectare de date"
+   + fără lanț de cereri render-blocking. Două subseturi per font: `latin` (æ/ø/å) și
+   `latin-ext` (diacritice PL: ł ą ę ż ś ć ń / RO: ă ș ț), alese de browser prin
+   unicode-range — se descarcă doar subsetul de care are nevoie textul afișat. */
+@font-face {
+  font-family: 'Inter'; font-style: normal; font-weight: 400 600; font-display: swap;
+  src: url('fonts/inter.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter'; font-style: normal; font-weight: 400 600; font-display: swap;
+  src: url('fonts/inter-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Space Grotesk'; font-style: normal; font-weight: 500 700; font-display: swap;
+  src: url('fonts/spacegrotesk.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Space Grotesk'; font-style: normal; font-weight: 500 700; font-display: swap;
+  src: url('fonts/spacegrotesk-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('fonts/ibmplexmono-500.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('fonts/ibmplexmono-500-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('fonts/ibmplexmono-600.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('fonts/ibmplexmono-600-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('fonts/ibmplexmono-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('fonts/ibmplexmono-700-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  --bg: #151A23;
+  --surface: #1E2430;
+  --surface-2: #262E3C;
+  --border: #343E4E;
+  --text: #F2F0EA;
+  --text-muted: #94A0B2;
+  --accent: #4A9EFF;
+  --accent-dim: #1F4A80;
+  --blue-night: #5B9BD9;
+  --green: #4CAF7D;
+  --red: #D9694F;
+  --radius: 14px;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', monospace;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: calc(18px + env(safe-area-inset-top)) 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-mark { width: 28px; height: 28px; display: block; flex-shrink: 0; }
+.brand-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+.brand-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+.topbar-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.lang-switch { display: flex; gap: 4px; }
+.lang-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.lang-btn.active { color: var(--accent); border-color: var(--accent); }
+
+.view { display: none; padding: 20px; flex: 1; }
+.view.active { display: block; }
+
+/* Signature LCD-style readout */
+.readout {
+  background: linear-gradient(180deg, #1F2633 0%, #151A23 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.readout::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 80% at 50% -10%, rgba(74,158,255,0.08), transparent 60%);
+  pointer-events: none;
+}
+.readout-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+.readout-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 44px;
+  letter-spacing: 0.01em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 18px rgba(74,158,255,0.35);
+  margin: 4px 0 2px;
+  word-break: break-word;
+}
+.readout-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+/* display doar când NU e hidden — altfel `display:flex` (stil autor) ar bate regula
+   de browser `[hidden]{display:none}` și nota ar rămâne mereu vizibilă. */
+.tax-reminder:not([hidden]) {
+  display: flex;
+}
+.tax-reminder {
+  gap: 12px;
+  align-items: flex-start;
+  background: rgba(74, 158, 255, 0.08);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.tax-reminder-icon {
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+.tax-reminder-body { flex: 1; }
+.tax-reminder-text {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.tax-reminder-btn {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.tax-reminder-btn:active { filter: brightness(0.9); }
+
+.shift-group { padding: 0; }
+.shift-group summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 18px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.shift-group summary::-webkit-details-marker { display: none; }
+.shift-group summary::after {
+  content: "▾";
+  font-size: 12px;
+  color: var(--accent);
+  transition: transform 0.15s ease;
+}
+.shift-group[open] summary::after { transform: rotate(180deg); }
+.shift-group-body {
+  padding: 0 18px 4px;
+  border-top: 1px solid var(--border);
+}
+.shift-group-body .field-row:last-child { border-bottom: none; }
+
+.overarbejde-section {
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+}
+.overarbejde-title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.weekend-shift-row {
+  padding-top: 6px;
+}
+.weekend-shift-row + .weekend-shift-row {
+  margin-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+.weekend-shift-head { gap: 8px; }
+.field-row select {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  flex: 1;
+}
+.remove-row-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--red);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-add-row {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px dashed var(--border);
+  color: var(--accent);
+  padding: 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  margin-top: 10px;
+}
+a.btn-add-row {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+}
+
+.shift-type-switch {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.shift-type-btn {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.2;
+  padding: 10px 2px;
+  border-radius: 9px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.shift-type-btn.active {
+  color: #06172E;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.shift-type-fields .field-row:first-child { border-top: 1px solid var(--border); }
+
+.field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.field-row:last-child { border-bottom: none; }
+
+.field-row label {
+  font-size: 14.5px;
+  color: var(--text);
+  flex: 1;
+}
+.hint {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.field-row input[inputmode="decimal"],
+.field-row input[type="time"] {
+  width: 100px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  text-align: right;
+}
+.field-row input[type="time"] { color-scheme: dark; }
+.field-row input[inputmode="decimal"]:focus,
+.field-row input[type="time"]:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.field-row input[readonly] {
+  color: var(--text-muted);
+  background: var(--surface);
+  cursor: default;
+}
+.admin-grid-block + .admin-grid-block { margin-top: 10px; }
+
+.toggle-row input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: #06172E;
+  border: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: transform 0.08s ease, filter 0.15s ease;
+}
+.btn-primary:active { transform: scale(0.98); filter: brightness(0.95); }
+
+.breakdown .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  font-size: 14.5px;
+  font-family: var(--font-mono);
+}
+.breakdown .row.muted { color: var(--text-muted); font-size: 13.5px; }
+.breakdown .row.strong {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--green);
+  padding-top: 10px;
+}
+.divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+.disclaimer {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin: 14px 0 0;
+  line-height: 1.5;
+}
+
+.save-msg {
+  text-align: center;
+  font-size: 13px;
+  color: var(--green);
+  min-height: 18px;
+}
+
+.privacy { padding: 6px 0 4px; }
+.privacy-updated {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin: 0 0 10px;
+}
+.privacy-intro {
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.55;
+  margin: 0 0 4px;
+}
+.privacy-h {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin: 16px 0 6px;
+}
+.privacy-p {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+}
+
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 11.5px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  padding: 6px 0;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.tab-icon { font-size: 19px; }
+.tab.active { color: var(--accent); }
+
+@media (min-width: 481px) {
+  .app { border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary { transition: none; }
+}
+
+/* Dagløn: rânduri de overarbejde (o zi = un rând cu ore), cu împărțirea 1.-2. / 3.-4. time afișată sub. */
+.ot-row { padding-top: 4px; }
+.ot-row + .ot-row { border-top: 1px dashed var(--border); }
+.ot-row .field-row { border-bottom: none; }
+.ot-split {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin: -4px 0 8px;
+}
+.settings-note {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0 0 6px;
+}

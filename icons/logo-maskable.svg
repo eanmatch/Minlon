@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1F2633"/>
+      <stop offset="100%" stop-color="#151A23"/>
+    </linearGradient>
+  </defs>
+  <!-- Fundal full-bleed (fără colțuri rotunjite: masca launcher-ului dă forma) -->
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- Conținut scalat la 0.8 în jurul centrului → rămâne în safe zone la mască circulară -->
+  <g transform="translate(256 256) scale(0.8) translate(-256 -256)">
+    <rect x="228" y="70" width="56" height="40" rx="12" fill="#4A9EFF"/>
+    <circle cx="256" cy="256" r="146" fill="none" stroke="#4A9EFF" stroke-width="22"/>
+    <g stroke="#4A9EFF" stroke-width="11" stroke-linecap="round">
+      <line x1="256" y1="118" x2="256" y2="140"/>
+      <line x1="256" y1="372" x2="256" y2="394"/>
+      <line x1="118" y1="256" x2="140" y2="256"/>
+      <line x1="372" y1="256" x2="394" y2="256"/>
+    </g>
+    <g stroke="#4A9EFF" stroke-width="24" stroke-linecap="round">
+      <line x1="256" y1="256" x2="198" y2="182"/>
+      <line x1="256" y1="256" x2="314" y2="182"/>
+    </g>
+    <circle cx="256" cy="256" r="16" fill="#4A9EFF"/>
+  </g>
+</svg>
