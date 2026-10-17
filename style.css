@@ -582,3 +582,18 @@ a.btn-add-row {
 .share-actions { display: flex; gap: 8px; }
 .share-actions .btn-add-row:not([hidden]) { flex: 1; }
 .share-dialog .btn-primary { margin: 4px 0 0; }
+
+/* Donație MobilePay: panou discret la finalul Setărilor, buton primar ca link. */
+.donate-card { text-align: center; }
+.donate-text {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0 0 12px;
+}
+a.btn-link {
+  display: block;
+  text-decoration: none;
+  text-align: center;
+  margin-bottom: 0;
+}
